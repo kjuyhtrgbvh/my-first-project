@@ -23,6 +23,10 @@ class Book(Base):
     description = Column(String(500), nullable=True)
     price = Column(Numeric(10, 2), nullable=False, default=0)
     url = Column(String(300), nullable=True)
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
+    category_id = Column(
+        Integer,
+        ForeignKey("categories.id", ondelete="CASCADE"),
+        nullable=False,
+    )
 
     category = relationship("Category", back_populates="books")

@@ -1,4 +1,6 @@
 import os
+from contextlib import contextmanager
+
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
@@ -21,8 +23,23 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 Base = declarative_base()
 
 
+@contextmanager
 def get_session():
-    return SessionLocal()
+    """
+    Контекстный менеджер для сессии БД.
+    Использование:
+        with get_session() as session:
+            ...
+    Сессия закрывается автоматически, даже если была ошибка.
+    """
+    session = SessionLocal()
+    try:
+        yield session
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 
 def init_engine():
